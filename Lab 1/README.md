@@ -58,7 +58,7 @@ That's one small step for a man, one giant leap for mankind.
 
 ---
 
-###**Flight**
+### **Flight**
 | Атрибут | Опис |
 |----------|------|
 | `departure_point` *(PK)* | Точка відправлення |
@@ -73,7 +73,7 @@ That's one small step for a man, one giant leap for mankind.
 
 ---
 
-###**Spaceship**
+### **Spaceship**
 | Атрибут | Опис |
 |----------|------|
 | `spaceship_name` *(PK)* | Унікальна назва корабля |
@@ -83,7 +83,7 @@ That's one small step for a man, one giant leap for mankind.
 
 ---
 
-###**Container**
+### **Container**
 | Атрибут | Опис |
 |----------|------|
 | `container_id` *(PK)* | Унікальний ідентифікатор контейнера |
@@ -91,7 +91,7 @@ That's one small step for a man, one giant leap for mankind.
 
 ---
 
-###**Baggage**
+### **Baggage**
 | Атрибут | Опис |
 |----------|------|
 | `baggage_id` *(PK)* | Унікальний ідентифікатор багажу |
@@ -102,7 +102,7 @@ That's one small step for a man, one giant leap for mankind.
 
 ---
 
-###**Robot**
+### **Robot**
 | Атрибут | Опис |
 |----------|------|
 | `robot_id` *(PK)* | Унікальний ідентифікатор робота |

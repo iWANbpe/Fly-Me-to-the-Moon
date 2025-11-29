@@ -1,0 +1,3 @@
+UPDATE PASSENGER
+SET NAME = 'Bob Cylinder', PHONE_NUMBER = '+447448932775', EMAIL = 'thatDudeBob@gmail.com'
+WHERE PASSENGER_ID = 7

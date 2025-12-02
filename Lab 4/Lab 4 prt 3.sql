@@ -16,8 +16,9 @@ SELECT
 FROM
 	FLIGHT F;
 
-SELECT S.name AS ship, SUM(C.mass) AS total_cargo_mass
+SELECT S.spaceship_name AS ship, SUM(C.max_weight) AS total_container_mass
 FROM SPACESHIP S
-JOIN FLIGHT F ON S.spaceship_id = F.spaceship_id
-JOIN CARGO_CONTAINER C ON C.flight_id = F.flight_id
-GROUP BY S.name;
+JOIN FLIGHT F ON S.spaceship_name = F.spaceship_name
+JOIN CONTAINER_FLIGHT CF ON CF.flight_id = F.flight_id
+JOIN CONTAINER C ON C.container_id = CF.container_id
+GROUP BY S.spaceship_name;

@@ -1,4 +1,4 @@
-SELECT P.name, F.depature_point, F.place_of_arrival
+SELECT P.name, F.departure_point, F.place_of_arrival
 FROM PASSENGER P
 JOIN PASSENGER_FLIGHT PF ON P.passenger_id = PF.passenger_id
 JOIN FLIGHT F ON PF.flight_id = F.flight_id;

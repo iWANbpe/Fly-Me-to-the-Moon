@@ -1,0 +1,3 @@
+DELETE
+FROM PASSENGER P 
+WHERE P.passenger_id = 7

@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model baggage {
+  baggage_id   Int        @id @default(autoincrement())
+  max_weight   Int        @db.SmallInt
+  passenger_id Int?       @unique
+  container_id Int
+  container    container  @relation(fields: [container_id], references: [container_id], onDelete: NoAction, onUpdate: NoAction)
+  passenger    passenger? @relation(fields: [passenger_id], references: [passenger_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model container {
+  container_id     Int                @id @default(autoincrement())
+  max_weight       Int
+  baggage          baggage[]
+  container_flight container_flight[]
+  robot            robot[]
+}
+
+model container_flight {
+  container_id Int
+  flight_id    Int
+  container    container @relation(fields: [container_id], references: [container_id], onDelete: NoAction, onUpdate: NoAction)
+  flight       flight    @relation(fields: [flight_id], references: [flight_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([container_id, flight_id])
+}
+
+model flight {
+  flight_id        Int                @id @default(autoincrement())
+  departure_point  String             @db.VarChar(32)
+  departure_date   DateTime           @db.Timestamp(6)
+  place_of_arrival String             @db.VarChar(32)
+  arrival_date     DateTime           @db.Timestamp(6)
+  spaceship_name   String?            @db.VarChar(64)
+  container_flight container_flight[]
+  spaceship        spaceship?         @relation(fields: [spaceship_name], references: [spaceship_name], onDelete: NoAction, onUpdate: NoAction)
+  passenger_flight passenger_flight[]
+}
+
+model full_health_analysis_result {
+  analysis_id    Int        @id @default(autoincrement())
+  expire_by      DateTime   @db.Date
+  allowed_to_fly Boolean
+  granted_by     String     @db.VarChar(32)
+  passenger      passenger?
+}
+
+model insurance {
+  insurance_id       Int        @id @default(autoincrement())
+  expire_by          DateTime   @db.Date
+  company_granted_by String     @db.VarChar(32)
+  passenger          passenger?
+}
+
+model passenger {
+  passenger_id                Int                         @id @default(autoincrement())
+  name                        String                      @db.VarChar(32)
+  phone_number                String                      @db.VarChar(32)
+  email                       String                      @db.VarChar(32)
+  analysis_id                 Int                         @unique
+  insurance_id                Int                         @unique
+  baggage                     baggage?
+  full_health_analysis_result full_health_analysis_result @relation(fields: [analysis_id], references: [analysis_id], onDelete: NoAction, onUpdate: NoAction)
+  insurance                   insurance                   @relation(fields: [insurance_id], references: [insurance_id], onDelete: NoAction, onUpdate: NoAction)
+  passenger_flight            passenger_flight[]
+}
+
+model passenger_flight {
+  passenger_id Int
+  flight_id    Int
+  flight       flight    @relation(fields: [flight_id], references: [flight_id], onDelete: NoAction, onUpdate: NoAction)
+  passenger    passenger @relation(fields: [passenger_id], references: [passenger_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([passenger_id, flight_id])
+}
+
+model robot {
+  robot_id            Int                 @id @default(autoincrement())
+  robot_model         String              @db.VarChar(32)
+  container_id        Int
+  robot_model_catalog robot_model_catalog @relation(fields: [robot_model], references: [robot_model], onDelete: NoAction, onUpdate: NoAction, map: "fk_robot_model")
+  container           container           @relation(fields: [container_id], references: [container_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model robot_model_catalog {
+  robot_model String  @id @db.VarChar(32)
+  function    String  @db.VarChar(128)
+  weight      Int     @db.SmallInt
+  robot       robot[]
+}
+
+model spaceship {
+  spaceship_name      String   @id @db.VarChar(64)
+  date_of_manufacture DateTime @db.Date
+  passenger_capacity  Int      @db.SmallInt
+  containers_capacity Int      @db.SmallInt
+  flight              flight[]
+}

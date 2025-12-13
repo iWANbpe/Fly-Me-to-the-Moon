@@ -104,4 +104,13 @@ model spaceship {
   passenger_capacity  Int      @db.SmallInt
   containers_capacity Int      @db.SmallInt
   flight              flight[]
+  service_log         ServiceLog?
+}
+
+model ServiceLog {
+  log_id            Int       @id @default(autoincrement())
+  date              DateTime  @default(now())
+  description       String    @db.VarChar(512) 
+  spaceshipName     String    @unique
+  spaceship         spaceship @relation(fields: [spaceshipName], references: [spaceship_name], onDelete: Cascade)
 }

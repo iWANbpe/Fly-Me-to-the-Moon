@@ -9,9 +9,10 @@ datasource db {
 
 model baggage {
   baggage_id   Int        @id @default(autoincrement())
-  max_weight   Int        @db.SmallInt
+  max_weight   Int
   passenger_id Int?       @unique
   container_id Int
+  type         String     @db.VarChar(32)
   container    container  @relation(fields: [container_id], references: [container_id], onDelete: NoAction, onUpdate: NoAction)
   passenger    passenger? @relation(fields: [passenger_id], references: [passenger_id], onDelete: NoAction, onUpdate: NoAction)
 }
@@ -93,24 +94,23 @@ model robot {
 
 model robot_model_catalog {
   robot_model String  @id @db.VarChar(32)
-  function    String  @db.VarChar(128)
   weight      Int     @db.SmallInt
   robot       robot[]
 }
 
 model spaceship {
-  spaceship_name      String   @id @db.VarChar(64)
-  date_of_manufacture DateTime @db.Date
-  passenger_capacity  Int      @db.SmallInt
-  containers_capacity Int      @db.SmallInt
-  flight              flight[]
+  spaceship_name      String      @id @db.VarChar(64)
+  date_of_manufacture DateTime    @db.Date
+  passenger_capacity  Int         @db.SmallInt
+  containers_capacity Int         @db.SmallInt
   service_log         ServiceLog?
+  flight              flight[]
 }
 
 model ServiceLog {
-  log_id            Int       @id @default(autoincrement())
-  date              DateTime  @default(now())
-  description       String    @db.VarChar(512) 
-  spaceshipName     String    @unique
-  spaceship         spaceship @relation(fields: [spaceshipName], references: [spaceship_name], onDelete: Cascade)
+  log_id        Int       @id @default(autoincrement())
+  date          DateTime  @default(now())
+  description   String    @db.VarChar(512)
+  spaceshipName String    @unique
+  spaceship     spaceship @relation(fields: [spaceshipName], references: [spaceship_name], onDelete: Cascade)
 }

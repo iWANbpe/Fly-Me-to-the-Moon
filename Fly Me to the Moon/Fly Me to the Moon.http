@@ -1,0 +1,6 @@
+@Fly_Me_to_the_Moon_HostAddress = http://localhost:5252
+
+GET {{Fly_Me_to_the_Moon_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

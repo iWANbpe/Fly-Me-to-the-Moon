@@ -1,0 +1,34 @@
+version: '3.9'
+
+services:
+  flymetothemoon:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=Fly_me_to_the_Moon;Username=postgres;Password=Iwan2006
+    ports:
+      - "8080"
+      - "8081"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    depends_on:
+      - db
+  db:
+    image: postgres:16-alpine
+    container_name: spaceflight_postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: user_fly
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: fly_me_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

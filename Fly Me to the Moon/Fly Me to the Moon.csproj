@@ -7,6 +7,7 @@
     <RootNamespace>Fly_Me_to_the_Moon</RootNamespace>
     <UserSecretsId>33d98ae8-2c08-4e6b-a7ee-fa701aa34c3e</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>

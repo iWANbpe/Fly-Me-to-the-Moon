@@ -29,11 +29,6 @@ namespace Fly_Me_to_the_Moon.Data
             modelBuilder.Entity<PassengerFlight>()
                 .HasKey(pf => new { pf.PassengerId, pf.FlightId });
 
-            modelBuilder.Entity<ServiceLog>()
-                .HasOne(s => s.Spaceship)
-                .WithOne(sh => sh.ServiceLog)
-                .HasForeignKey<ServiceLog>(s => s.SpaceshipName);
-
             modelBuilder.Entity<Baggage>()
                 .HasOne(b => b.Passenger)
                 .WithOne(p => p.Baggage)
@@ -44,7 +39,6 @@ namespace Fly_Me_to_the_Moon.Data
                 .WithOne(i => i.Passenger)
                 .HasForeignKey<Passenger>(p => p.InsuranceId);
 
-
             modelBuilder.Entity<Passenger>()
                 .HasOne(p => p.FullHealthAnalysisResult)
                 .WithOne(a => a.Passenger)
@@ -54,6 +48,29 @@ namespace Fly_Me_to_the_Moon.Data
                 .HasOne(r => r.RobotModelCatalog)
                 .WithMany(rm => rm.Robot)
                 .HasForeignKey(r => r.RobotModel);
+            
+            modelBuilder.Entity<ServiceLog>()
+                .HasOne(sl => sl.Spaceship)     
+                .WithMany(sh => sh.ServiceLog) 
+                .HasForeignKey(sl => sl.SpaceshipName);
+
+            modelBuilder.Entity<Flight>()
+                .HasOne(f => f.Spaceship)
+                .WithMany(s => s.Flight)
+                .HasForeignKey(f => f.SpaceshipName);
+
+            modelBuilder.Entity<Baggage>().ToTable("baggage");
+            modelBuilder.Entity<Container>().ToTable("container");
+            modelBuilder.Entity<ContainerFlight>().ToTable("container_flight");
+            modelBuilder.Entity<Flight>().ToTable("flight");
+            modelBuilder.Entity<FullHealthAnalysisResult>().ToTable("full_health_analysis_result");
+            modelBuilder.Entity<Insurance>().ToTable("insurance");
+            modelBuilder.Entity<Passenger>().ToTable("passenger");
+            modelBuilder.Entity<PassengerFlight>().ToTable("passenger_flight");
+            modelBuilder.Entity<Robot>().ToTable("robot");
+            modelBuilder.Entity<RobotModelCatalog>().ToTable("robot_model_catalog");
+            modelBuilder.Entity<Spaceship>().ToTable("spaceship");
+            modelBuilder.Entity<ServiceLog>().ToTable("service_log");
 
             base.OnModelCreating(modelBuilder);
         }

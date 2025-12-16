@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Fly_Me_to_the_Moon.Migrations
 {
     [DbContext(typeof(SpaceFlightContext))]
-    [Migration("20251215161359_InitialSchema")]
-    partial class InitialSchema
+    [Migration("20251216221141_SchemaSetup")]
+    partial class SchemaSetup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,7 +53,7 @@ namespace Fly_Me_to_the_Moon.Migrations
                     b.HasIndex("PassengerId")
                         .IsUnique();
 
-                    b.ToTable("Baggage");
+                    b.ToTable("baggage", (string)null);
                 });
 
             modelBuilder.Entity("Fly_Me_to_the_Moon.Models.Container", b =>
@@ -69,7 +69,7 @@ namespace Fly_Me_to_the_Moon.Migrations
 
                     b.HasKey("ContainerId");
 
-                    b.ToTable("Container");
+                    b.ToTable("container", (string)null);
                 });
 
             modelBuilder.Entity("Fly_Me_to_the_Moon.Models.ContainerFlight", b =>
@@ -84,7 +84,7 @@ namespace Fly_Me_to_the_Moon.Migrations
 
                     b.HasIndex("FlightId");
 
-                    b.ToTable("ContainerFlight");
+                    b.ToTable("container_flight", (string)null);
                 });
 
             modelBuilder.Entity("Fly_Me_to_the_Moon.Models.Flight", b =>
@@ -112,14 +112,11 @@ namespace Fly_Me_to_the_Moon.Migrations
                     b.Property<string>("SpaceshipName")
                         .HasColumnType("text");
 
-                    b.Property<string>("SpaceshipName1")
-                        .HasColumnType("text");
-
                     b.HasKey("FlightId");
 
-                    b.HasIndex("SpaceshipName1");
+                    b.HasIndex("SpaceshipName");
 
-                    b.ToTable("Flight");
+                    b.ToTable("flight", (string)null);
                 });
 
             modelBuilder.Entity("Fly_Me_to_the_Moon.Models.FullHealthAnalysisResult", b =>
@@ -142,7 +139,7 @@ namespace Fly_Me_to_the_Moon.Migrations
 
                     b.HasKey("AnalysisId");
 
-                    b.ToTable("FullHealthAnalysisResult");
+                    b.ToTable("full_health_analysis_result", (string)null);
                 });
 
             modelBuilder.Entity("Fly_Me_to_the_Moon.Models.Insurance", b =>
@@ -162,7 +159,7 @@ namespace Fly_Me_to_the_Moon.Migrations
 
                     b.HasKey("InsuranceId");
 
-                    b.ToTable("Insurance");
+                    b.ToTable("insurance", (string)null);
                 });
 
             modelBuilder.Entity("Fly_Me_to_the_Moon.Models.Passenger", b =>
@@ -199,7 +196,7 @@ namespace Fly_Me_to_the_Moon.Migrations
                     b.HasIndex("InsuranceId")
                         .IsUnique();
 
-                    b.ToTable("Passenger");
+                    b.ToTable("passenger", (string)null);
                 });
 
             modelBuilder.Entity("Fly_Me_to_the_Moon.Models.PassengerFlight", b =>
@@ -214,7 +211,7 @@ namespace Fly_Me_to_the_Moon.Migrations
 
                     b.HasIndex("FlightId");
 
-                    b.ToTable("PassengerFlight");
+                    b.ToTable("passenger_flight", (string)null);
                 });
 
             modelBuilder.Entity("Fly_Me_to_the_Moon.Models.Robot", b =>
@@ -238,7 +235,7 @@ namespace Fly_Me_to_the_Moon.Migrations
 
                     b.HasIndex("RobotModel");
 
-                    b.ToTable("Robot");
+                    b.ToTable("robot", (string)null);
                 });
 
             modelBuilder.Entity("Fly_Me_to_the_Moon.Models.RobotModelCatalog", b =>
@@ -251,7 +248,7 @@ namespace Fly_Me_to_the_Moon.Migrations
 
                     b.HasKey("RobotModel");
 
-                    b.ToTable("RobotModelCatalog");
+                    b.ToTable("robot_model_catalog", (string)null);
                 });
 
             modelBuilder.Entity("Fly_Me_to_the_Moon.Models.ServiceLog", b =>
@@ -275,10 +272,9 @@ namespace Fly_Me_to_the_Moon.Migrations
 
                     b.HasKey("LogId");
 
-                    b.HasIndex("SpaceshipName")
-                        .IsUnique();
+                    b.HasIndex("SpaceshipName");
 
-                    b.ToTable("ServiceLog");
+                    b.ToTable("service_log", (string)null);
                 });
 
             modelBuilder.Entity("Fly_Me_to_the_Moon.Models.Spaceship", b =>
@@ -297,7 +293,7 @@ namespace Fly_Me_to_the_Moon.Migrations
 
                     b.HasKey("SpaceshipName");
 
-                    b.ToTable("Spaceship");
+                    b.ToTable("spaceship", (string)null);
                 });
 
             modelBuilder.Entity("Fly_Me_to_the_Moon.Models.Baggage", b =>
@@ -340,7 +336,7 @@ namespace Fly_Me_to_the_Moon.Migrations
                 {
                     b.HasOne("Fly_Me_to_the_Moon.Models.Spaceship", "Spaceship")
                         .WithMany("Flight")
-                        .HasForeignKey("SpaceshipName1");
+                        .HasForeignKey("SpaceshipName");
 
                     b.Navigation("Spaceship");
                 });
@@ -405,8 +401,8 @@ namespace Fly_Me_to_the_Moon.Migrations
             modelBuilder.Entity("Fly_Me_to_the_Moon.Models.ServiceLog", b =>
                 {
                     b.HasOne("Fly_Me_to_the_Moon.Models.Spaceship", "Spaceship")
-                        .WithOne("ServiceLog")
-                        .HasForeignKey("Fly_Me_to_the_Moon.Models.ServiceLog", "SpaceshipName")
+                        .WithMany("ServiceLog")
+                        .HasForeignKey("SpaceshipName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

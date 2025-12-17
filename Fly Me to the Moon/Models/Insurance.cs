@@ -10,5 +10,8 @@ namespace Fly_Me_to_the_Moon.Models
         public string CompanyGrantedBy { get; set; } = string.Empty;
 
         public Passenger? Passenger { get; set; }
+
+        [Timestamp]
+        public uint RowVersion { get; set; }
     }
 }

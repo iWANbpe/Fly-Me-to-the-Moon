@@ -17,5 +17,8 @@ namespace Fly_Me_to_the_Moon.Models
         public Insurance Insurance { get; set; } = null!;
         public ICollection<PassengerFlight>? PassengerFlight { get; set; } = new List<PassengerFlight>();
         public Baggage? Baggage { get; set; }
+
+        [Timestamp]
+        public uint RowVersion { get; set; }
     }
 }

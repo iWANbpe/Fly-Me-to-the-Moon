@@ -8,7 +8,6 @@ namespace Fly_Me_to_the_Moon.Services
     public class PassengerService
     {
         private readonly SpaceFlightContext _context;
-        private const int DefaultMaxWeightKg = 60;
 
         public PassengerService(SpaceFlightContext context)
         {
@@ -26,10 +25,6 @@ namespace Fly_Me_to_the_Moon.Services
 
                 try
                 {
-                    if (!dto.FullHealthAnalysisResultDetails.AllowedToFly)
-                    {
-                        throw new InvalidOperationException("Passenger is not allowed to fly based on health analysis.");
-                    }
                     var insurance = new Insurance
                     {
                         ExpireBy = dto.InsuranceDetails.ExpireBy,
@@ -126,6 +121,71 @@ namespace Fly_Me_to_the_Moon.Services
             });
 
             return deletionSuccessful;
+        }
+
+        public async Task<Passenger> UpdatePassengerAndLinked(int passengerId, UpdatePassengerDto dto)
+        {
+            var strategy = _context.Database.CreateExecutionStrategy();
+            Passenger updatedPassenger = null;
+
+            await strategy.ExecuteAsync(async () =>
+            {
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+
+                try
+                {
+                    var passengerToUpdate = await _context.Passenger
+                        .Include(p => p.Insurance)
+                        .Include(p => p.FullHealthAnalysisResult)
+                        .FirstOrDefaultAsync(p => p.PassengerId == passengerId);
+
+                    if (passengerToUpdate == null)
+                    {
+                        throw new KeyNotFoundException($"Passenger with ID {passengerId} not found.");
+                    }
+
+                    passengerToUpdate.Name = dto.Name;
+                    passengerToUpdate.PhoneNumber = dto.PhoneNumber;
+                    passengerToUpdate.Email = dto.Email;
+
+                    _context.Entry(passengerToUpdate).Property(p => p.RowVersion).OriginalValue = dto.PassengerRowVersion;
+
+                    if (passengerToUpdate.Insurance != null)
+                    {
+                        var ins = passengerToUpdate.Insurance;
+                        ins.ExpireBy = dto.InsuranceDetails.ExpireBy;
+                        ins.CompanyGrantedBy = dto.InsuranceDetails.CompanyGrantedBy;
+                        _context.Entry(ins).Property(i => i.RowVersion).OriginalValue = dto.InsuranceDetails.InsuranceRowVersion;
+                    }
+
+                    if (passengerToUpdate.FullHealthAnalysisResult != null)
+                    {
+                        var fhar = passengerToUpdate.FullHealthAnalysisResult;
+                        fhar.ExpireBy = dto.FHARDetails.ExpireBy;
+                        fhar.AllowedToFly = dto.FHARDetails.AllowedToFly;
+                        fhar.GrantedBy = dto.FHARDetails.GrantedBy;
+                        _context.Entry(fhar).Property(f => f.RowVersion).OriginalValue = dto.FHARDetails.FHARRowVersion;
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    updatedPassenger = passengerToUpdate;
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    await transaction.RollbackAsync();
+                    string error = "Update failed. The record (Passenger, Insurance or FHAR) has been modified by another user. Please refresh and try again.";
+                    throw new InvalidOperationException(error, ex);
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            });
+
+            return updatedPassenger;
         }
     }
 }

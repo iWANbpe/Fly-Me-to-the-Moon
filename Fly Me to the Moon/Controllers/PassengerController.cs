@@ -12,12 +12,12 @@ namespace Fly_Me_to_the_Moon.Controllers
     public class PassengerController : ControllerBase
     {
         private readonly SpaceFlightContext _context;
-        private readonly PassengerService _bookingService;
+        private readonly PassengerService _passengerService;
 
         public PassengerController(SpaceFlightContext context, PassengerService bookingService)
         {
             _context = context;
-            _bookingService = bookingService;
+            _passengerService = bookingService;
         }
 
         [HttpGet]
@@ -61,7 +61,7 @@ namespace Fly_Me_to_the_Moon.Controllers
 
             try
             {
-                var newPassenger = await _bookingService.CreatePassengerWithDetails(request);
+                var newPassenger = await _passengerService.CreatePassengerWithDetails(request);
 
 
                 return CreatedAtAction(
@@ -89,7 +89,7 @@ namespace Fly_Me_to_the_Moon.Controllers
         {
             try
             {
-                bool wasDeleted = await _bookingService.DeletePassengerWithDetails(id);
+                bool wasDeleted = await _passengerService.DeletePassengerWithDetails(id);
 
                 if (!wasDeleted)
                 {
@@ -105,6 +105,41 @@ namespace Fly_Me_to_the_Moon.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An unexpected error occurred during deletion: {ex.Message}");
+            }
+        }
+
+        [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UpdatePassenger(int id, [FromBody] UpdatePassengerDto request)
+        {
+            if (id != request.PassengerId)
+            {
+                return BadRequest("Passenger ID mismatch.");
+            }
+
+            try
+            {
+                var updatedPassenger = await _passengerService.UpdatePassengerAndLinked(id, request);
+                return Ok(updatedPassenger);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("modified by another user"))
+            {
+                return Conflict(ex.Message);
+            }
+            catch (DbUpdateException ex)
+            {
+                return BadRequest($"Update failed due to data violation. Details: {ex.InnerException?.Message ?? ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 

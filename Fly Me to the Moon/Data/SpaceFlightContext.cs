@@ -23,6 +23,7 @@ namespace Fly_Me_to_the_Moon.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            #region Relationships
             modelBuilder.Entity<ContainerFlight>()
                 .HasKey(cf => new { cf.ContainerId, cf.FlightId });
 
@@ -48,17 +49,18 @@ namespace Fly_Me_to_the_Moon.Data
                 .HasOne(r => r.RobotModelCatalog)
                 .WithMany(rm => rm.Robot)
                 .HasForeignKey(r => r.RobotModel);
-            
+
             modelBuilder.Entity<ServiceLog>()
-                .HasOne(sl => sl.Spaceship)     
-                .WithMany(sh => sh.ServiceLog) 
+                .HasOne(sl => sl.Spaceship)
+                .WithMany(sh => sh.ServiceLog)
                 .HasForeignKey(sl => sl.SpaceshipName);
 
             modelBuilder.Entity<Flight>()
                 .HasOne(f => f.Spaceship)
                 .WithMany(s => s.Flight)
                 .HasForeignKey(f => f.SpaceshipName);
-
+            #endregion
+            #region ToTable
             modelBuilder.Entity<Baggage>().ToTable("baggage");
             modelBuilder.Entity<Container>().ToTable("container");
             modelBuilder.Entity<ContainerFlight>().ToTable("container_flight");
@@ -71,7 +73,53 @@ namespace Fly_Me_to_the_Moon.Data
             modelBuilder.Entity<RobotModelCatalog>().ToTable("robot_model_catalog");
             modelBuilder.Entity<Spaceship>().ToTable("spaceship");
             modelBuilder.Entity<ServiceLog>().ToTable("service_log");
+            #endregion
+            #region Indexes
+            modelBuilder.Entity<Passenger>()
+                .HasIndex(p => p.Name)
+                .IsUnique(false)
+                .HasDatabaseName("IX_Passenger_Name");
 
+            modelBuilder.Entity<Passenger>()
+                .HasIndex(p => p.PhoneNumber)
+                .IsUnique(true)
+                .HasDatabaseName("IX_Passenger_PhoneNumber");
+
+            modelBuilder.Entity<Flight>()
+                .HasIndex(f => f.SpaceshipName)
+                .IsUnique(false)
+                .HasDatabaseName("IX_Flight_SpaceshipName");
+
+            modelBuilder.Entity<Flight>()
+                .HasIndex(f => f.DepartureDate)
+                .IsUnique(false)
+                .HasDatabaseName("IX_Flight_DepartureDate");
+            
+            modelBuilder.Entity<Flight>()
+                .HasIndex(f => f.ArrivalDate)
+                .IsUnique(false)
+                .HasDatabaseName("IX_Flight_ArrivalDate");
+
+            modelBuilder.Entity<Robot>()
+                .HasIndex(r => r.RobotModel)
+                .IsUnique(false)
+                .HasDatabaseName("IX_Robot_RobotModel");
+
+            modelBuilder.Entity<ServiceLog>()
+                .HasIndex(sl => sl.SpaceshipName)
+                .IsUnique(false)
+                .HasDatabaseName("IX_ServiceLog_SpaceshipName");
+
+            modelBuilder.Entity<Spaceship>()
+                .HasIndex(s => s.SpaceshipName)
+                .IsUnique(true)
+                .HasDatabaseName("IX_Spaceship_Name");
+
+            modelBuilder.Entity<FullHealthAnalysisResult>()
+                .HasIndex(a => a.AllowedToFly)
+                .IsUnique(false)
+                .HasDatabaseName("IX_FullHealthAnalysisResult_AllowedToFly");
+            #endregion
             base.OnModelCreating(modelBuilder);
         }
     }

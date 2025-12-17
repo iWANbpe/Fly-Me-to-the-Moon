@@ -15,7 +15,7 @@ namespace Fly_Me_to_the_Moon.Models
 
         public FullHealthAnalysisResult FullHealthAnalysisResult { get; set; } = null!;
         public Insurance Insurance { get; set; } = null!;
-        public ICollection<PassengerFlight> PassengerFlight { get; set; } = new List<PassengerFlight>();
+        public ICollection<PassengerFlight>? PassengerFlight { get; set; } = new List<PassengerFlight>();
         public Baggage? Baggage { get; set; }
     }
 }

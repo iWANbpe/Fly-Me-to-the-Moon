@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Fly_Me_to_the_Moon.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System.Data.Common; // Для DbCommand
-using Fly_Me_to_the_Moon.Data; // Переконайтеся, що це правильний простір імен для вашого DbContext
+using System.Data.Common;
 
 namespace FlyMeToTheMoon.Controllers
 {
@@ -35,26 +34,19 @@ namespace FlyMeToTheMoon.Controllers
 
             try
             {
-                // 1. Відкриваємо з'єднання
+
                 await connection.OpenAsync();
 
-                // 2. Створюємо команду для підрахунку таблиць у загальнодоступній схемі
                 using var command = connection.CreateCommand();
-
-                // SQL-запит для PostgreSQL, який повертає кількість таблиць
-                // (WHERE table_schema = 'public' виключає системні таблиці)
                 command.CommandText = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';";
-
-                // 3. Виконуємо запит, щоб отримати скалярне значення (число)
                 var result = await command.ExecuteScalarAsync();
 
-                // 4. Обробляємо результат
-                int tableCount = Convert.ToInt32(result);
 
+                int tableCount = Convert.ToInt32(result);
                 status["Status"] = "SUCCESS: Database connection established.";
                 status["Table Count"] = tableCount;
 
-                // Додаємо діагностичний вивід
+
                 if (tableCount > 0)
                 {
                     status["Message"] = $"Found {tableCount} user-defined tables (excluding system tables).";
@@ -67,7 +59,6 @@ namespace FlyMeToTheMoon.Controllers
             }
             catch (Exception ex)
             {
-                // 5. Обробка помилок підключення
                 status["Status"] = "FAILURE: Fatal Error during connection or command execution.";
                 status["Table Count"] = -1;
                 status["Error Message"] = ex.Message;
@@ -75,7 +66,6 @@ namespace FlyMeToTheMoon.Controllers
             }
             finally
             {
-                // Завжди закриваємо з'єднання
                 await connection.CloseAsync();
             }
 

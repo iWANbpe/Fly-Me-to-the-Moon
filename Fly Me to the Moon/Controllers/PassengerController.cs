@@ -1,5 +1,7 @@
 ﻿using Fly_Me_to_the_Moon.Data;
+using Fly_Me_to_the_Moon.Dtos;
 using Fly_Me_to_the_Moon.Models;
+using Fly_Me_to_the_Moon.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,10 +12,12 @@ namespace Fly_Me_to_the_Moon.Controllers
     public class PassengerController : ControllerBase
     {
         private readonly SpaceFlightContext _context;
- 
-        public PassengerController(SpaceFlightContext context)
+        private readonly BookingService _bookingService;
+
+        public PassengerController(SpaceFlightContext context, BookingService bookingService)
         {
             _context = context;
+            _bookingService = bookingService;
         }
 
         [HttpGet]
@@ -46,17 +50,36 @@ namespace Fly_Me_to_the_Moon.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Passenger>> PostPassenger(Passenger passenger)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> RegisterPassenger([FromBody] BookingRequestDto request)
         {
-            if (_context.Passenger == null)
+            if (!ModelState.IsValid)
             {
-
-                return Problem("Entity set 'SpaceFlightContext.Passengers' is null.");
+                return BadRequest(ModelState);
             }
 
-            _context.Passenger.Add(passenger);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetPassenger), new { id = passenger.PassengerId }, passenger);
+            try
+            {
+                var newPassenger = await _bookingService.CreatePassengerWithDetails(request);
+
+
+                return CreatedAtAction(
+
+                    actionName: "GetPassenger",
+                    routeValues: new { id = newPassenger.PassengerId },
+                    value: newPassenger
+                );
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
+
     }
 }

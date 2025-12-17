@@ -1,9 +1,7 @@
-version: '3.9'
-
 services:
   flymetothemoon:
     environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=Fly_me_to_the_Moon;Username=postgres;Password=Iwan2006
+      - ConnectionStrings__DefaultConnection=Host=spaceflight_postgres_db;Port=5432;Database=Fly_me_to_the_Moon;Username=postgres;Password=Iwan2006
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
@@ -17,7 +15,8 @@ services:
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
     depends_on:
-      - db
+      db:
+        condition: service_healthy
   db:
     image: postgres:16-alpine
     container_name: spaceflight_postgres_db

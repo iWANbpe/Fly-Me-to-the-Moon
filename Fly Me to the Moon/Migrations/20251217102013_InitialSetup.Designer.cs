@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Fly_Me_to_the_Moon.Migrations
 {
     [DbContext(typeof(SpaceFlightContext))]
-    [Migration("20251216221141_SchemaSetup")]
-    partial class SchemaSetup
+    [Migration("20251217102013_InitialSetup")]
+    partial class InitialSetup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

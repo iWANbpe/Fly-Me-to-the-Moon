@@ -17,32 +17,19 @@ namespace Fly_Me_to_the_Moon.Services
 
         public async Task<Passenger> CreatePassengerWithDetails(BookingRequestDto dto)
         {
-            // 1. ОТРИМАННЯ СТРАТЕГІЇ ВИКОНАННЯ
             var strategy = _context.Database.CreateExecutionStrategy();
-
-            // 2. ЗАПУСК ВСІЄЇ ЛОГІКИ У БЛОЦІ СТРАТЕГІЇ
-            // Ця перевантаження ExecuteAsync не повертає значення, тому ми повертаємо PassengerResult
-            // УВАГА: Ми повинні ініціалізувати PassengerResult всередині блоку для коректного мапінгу
-
-            Passenger passengerResult = null; // Буде містити створений об'єкт
+            Passenger passengerResult = null;
 
             await strategy.ExecuteAsync(async () =>
             {
-                // Транзакція автоматично починається тут
                 await using var transaction = await _context.Database.BeginTransactionAsync();
 
                 try
                 {
-                    // 3. БІЗНЕС-ЛОГІКА ТА ВАЛІДАЦІЯ
                     if (!dto.FullHealthAnalysisResultDetails.AllowedToFly)
                     {
-                        // Цей виняток буде перехоплено, транзакція відкотиться, і клієнт отримає 400 Bad Request.
                         throw new InvalidOperationException("Passenger is not allowed to fly based on health analysis.");
                     }
-
-                    // 4. ПОВНИЙ МЕХАНІЗМ МАПІНГУ ТА ІНІЦІАЛІЗАЦІЇ
-
-                    // Створення дочірніх об'єктів
                     var insurance = new Insurance
                     {
                         ExpireBy = dto.InsuranceDetails.ExpireBy,
@@ -111,8 +98,63 @@ namespace Fly_Me_to_the_Moon.Services
                 }
             });
 
-            // 7. Повертаємо створений об'єкт Passenger (він вже має згенеровані ID)
             return passengerResult;
+        }
+
+        public async Task<bool> DeletePassengerWithDetails(int passengerId)
+        {
+            var strategy = _context.Database.CreateExecutionStrategy();
+            bool deletionSuccessful = false;
+
+            await strategy.ExecuteAsync(async () =>
+            {
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+
+                try
+                {
+                    var passenger = await _context.Passenger
+                        .Include(p => p.Insurance)
+                        .Include(p => p.FullHealthAnalysisResult)
+                        .Include(p => p.Baggage)
+                        .FirstOrDefaultAsync(p => p.PassengerId == passengerId);
+
+                    if (passenger == null)
+                    {
+                        await transaction.CommitAsync();
+                        return;
+                    }
+
+                    if (passenger.Insurance != null)
+                    {
+                        _context.Insurance.Remove(passenger.Insurance);
+                    }
+
+                    if (passenger.FullHealthAnalysisResult != null)
+                    {
+                        _context.FullHealthAnalysisResult.Remove(passenger.FullHealthAnalysisResult);
+                    }
+
+                    if (passenger.Baggage != null)
+                    {
+                        _context.Baggage.Remove(passenger.Baggage);
+                    }
+
+                    _context.Passenger.Remove(passenger);
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    deletionSuccessful = true;
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine($"FATAL DELETION ERROR: {ex.Message}");
+                    throw new ApplicationException($"Passenger deletion failed. Transaction rolled back. Details: {ex.Message}", ex);
+                }
+            });
+
+            return deletionSuccessful;
         }
     }
 }

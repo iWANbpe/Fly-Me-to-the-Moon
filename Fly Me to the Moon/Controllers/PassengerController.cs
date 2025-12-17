@@ -81,5 +81,32 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeletePassenger(int id)
+        {
+            try
+            {
+                bool wasDeleted = await _bookingService.DeletePassengerWithDetails(id);
+
+                if (!wasDeleted)
+                {
+                    return NotFound($"Passenger with ID {id} not found.");
+                }
+
+                return NoContent();
+            }
+            catch (ApplicationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An unexpected error occurred during deletion: {ex.Message}");
+            }
+        }
+
     }
 }

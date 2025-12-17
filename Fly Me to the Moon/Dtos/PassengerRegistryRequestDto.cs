@@ -2,7 +2,7 @@
 
 namespace Fly_Me_to_the_Moon.Dtos
 {
-    public class BookingRequestDto
+    public class PassengerRegistryRequestDto
     {
 
         [Required(ErrorMessage = "Name is required.")]
@@ -22,7 +22,5 @@ namespace Fly_Me_to_the_Moon.Dtos
 
         [Required(ErrorMessage = "Details of Full Health Analysis Result(FHAR) are required.")]
         public FullHealthAnalysisResultDto FullHealthAnalysisResultDetails { get; set; } = null!;
-
-        public BaggageDto? BaggageDetails { get; set; }
     }
 }

@@ -12,9 +12,9 @@ namespace Fly_Me_to_the_Moon.Controllers
     public class PassengerController : ControllerBase
     {
         private readonly SpaceFlightContext _context;
-        private readonly BookingService _bookingService;
+        private readonly PassengerService _bookingService;
 
-        public PassengerController(SpaceFlightContext context, BookingService bookingService)
+        public PassengerController(SpaceFlightContext context, PassengerService bookingService)
         {
             _context = context;
             _bookingService = bookingService;
@@ -52,7 +52,7 @@ namespace Fly_Me_to_the_Moon.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> RegisterPassenger([FromBody] BookingRequestDto request)
+        public async Task<IActionResult> RegisterPassenger([FromBody] PassengerRegistryRequestDto request)
         {
             if (!ModelState.IsValid)
             {

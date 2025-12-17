@@ -5,17 +5,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Fly_Me_to_the_Moon.Services
 {
-    public class BookingService
+    public class PassengerService
     {
         private readonly SpaceFlightContext _context;
         private const int DefaultMaxWeightKg = 60;
 
-        public BookingService(SpaceFlightContext context)
+        public PassengerService(SpaceFlightContext context)
         {
             _context = context;
         }
 
-        public async Task<Passenger> CreatePassengerWithDetails(BookingRequestDto dto)
+        public async Task<Passenger> CreatePassengerWithDetails(PassengerRegistryRequestDto dto)
         {
             var strategy = _context.Database.CreateExecutionStrategy();
             Passenger passengerResult = null;
@@ -43,42 +43,18 @@ namespace Fly_Me_to_the_Moon.Services
                         GrantedBy = dto.FullHealthAnalysisResultDetails.GrantedBy
                     };
 
-                    if (dto.BaggageDetails != null)
+                    passengerResult = new Passenger
                     {
-                        var baggage = new Baggage
-                        {
-                            Type = dto.BaggageDetails.Type,
-                            MaxWeight = DefaultMaxWeightKg
-                        };
+                        Name = dto.Name,
+                        PhoneNumber = dto.PhoneNumber,
+                        Email = dto.Email,
 
-                        passengerResult = new Passenger
-                        {
-                            Name = dto.Name,
-                            PhoneNumber = dto.PhoneNumber,
-                            Email = dto.Email,
+                        Insurance = insurance,
+                        InsuranceId = insurance.InsuranceId,
+                        FullHealthAnalysisResult = healthAnalysis,
+                        AnalysisId = healthAnalysis.AnalysisId
+                    };
 
-                            Insurance = insurance,
-                            InsuranceId = insurance.InsuranceId,
-                            FullHealthAnalysisResult = healthAnalysis,
-                            AnalysisId = healthAnalysis.AnalysisId,
-                            Baggage = baggage
-                        };
-                    }
-
-                    else
-                    {
-                        passengerResult = new Passenger
-                        {
-                            Name = dto.Name,
-                            PhoneNumber = dto.PhoneNumber,
-                            Email = dto.Email,
-
-                            Insurance = insurance,
-                            InsuranceId = insurance.InsuranceId,
-                            FullHealthAnalysisResult = healthAnalysis,
-                            AnalysisId = healthAnalysis.AnalysisId
-                        };
-                    }
 
                     _context.Passenger.Add(passengerResult);
                     await _context.SaveChangesAsync();
@@ -132,11 +108,6 @@ namespace Fly_Me_to_the_Moon.Services
                     if (passenger.FullHealthAnalysisResult != null)
                     {
                         _context.FullHealthAnalysisResult.Remove(passenger.FullHealthAnalysisResult);
-                    }
-
-                    if (passenger.Baggage != null)
-                    {
-                        _context.Baggage.Remove(passenger.Baggage);
                     }
 
                     _context.Passenger.Remove(passenger);

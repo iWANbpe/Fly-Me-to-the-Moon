@@ -2,10 +2,10 @@
 {
     public class PassengerFlight
     {
-        public int PassengerId { get; set; }
-        public int FlightId { get; set; }
+        public int? PassengerId { get; set; }
+        public int? FlightId { get; set; }
 
-        public Passenger Passenger { get; set; } = null!;
-        public Flight Flight { get; set; } = null!;
+        public Passenger? Passenger { get; set; }
+        public Flight? Flight { get; set; }
     }
 }

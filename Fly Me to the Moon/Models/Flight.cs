@@ -14,7 +14,7 @@ namespace Fly_Me_to_the_Moon.Models
 
         public string? SpaceshipName { get; set; }
         public Spaceship? Spaceship { get; set; }
-        public ICollection<ContainerFlight> ContainerFlight { get; set; } = new List<ContainerFlight>();
-        public ICollection<PassengerFlight> PassengerFlight { get; set; } = new List<PassengerFlight>();
+        public ICollection<ContainerFlight>? ContainerFlight { get; set; }
+        public ICollection<PassengerFlight>? PassengerFlight { get; set; }
     }
 }

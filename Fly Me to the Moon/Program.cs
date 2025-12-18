@@ -15,6 +15,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<PassengerService>();
 builder.Services.AddScoped<FlightService>();
+builder.Services.AddScoped<SpaceshipService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<SpaceFlightContext>(options =>

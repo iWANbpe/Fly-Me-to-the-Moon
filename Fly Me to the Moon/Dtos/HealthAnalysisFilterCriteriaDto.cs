@@ -1,7 +1,8 @@
 ﻿namespace Fly_Me_to_the_Moon.Dtos
 {
-    public class ExpiredInsuranceFilterCriteriaDto
+    public class HealthAnalysisFilterCriteriaDto
     {
+
         private DateTime _expiryDate = DateTime.Today;
 
         public DateTime Date

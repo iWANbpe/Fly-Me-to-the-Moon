@@ -204,15 +204,8 @@ namespace Fly_Me_to_the_Moon.Services
 
             var query = from p in _context.Passenger
                         join i in _context.Insurance on p.InsuranceId equals i.InsuranceId
-                        where i.ExpireBy < filter.MaxExpiryDate
+                        where i.ExpireBy < filter.Date
                         select new { p, i };
-
-
-            if (!string.IsNullOrWhiteSpace(filter.CompanyName))
-            {
-                string companyNameLower = filter.CompanyName.ToLower();
-                query = query.Where(x => x.i.CompanyGrantedBy.ToLower().Contains(companyNameLower));
-            }
 
             var result = await query
                 .OrderBy(x => x.i.ExpireBy)
@@ -227,6 +220,39 @@ namespace Fly_Me_to_the_Moon.Services
                     {
                         ExpireBy = x.i.ExpireBy,
                         CompanyGrantedBy = x.i.CompanyGrantedBy
+                    }
+                })
+                .ToListAsync();
+
+            return result;
+        }
+
+        public async Task<List<PassengerHealthAnalysisDto>> GetPassengersWithExpiringHealthAnalysis(HealthAnalysisFilterCriteriaDto filter, int pageNumber = 1, int pageSize = 15)
+        {
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 15;
+
+            int skip = (pageNumber - 1) * pageSize;
+
+            var query = from p in _context.Passenger
+                        join f in _context.FullHealthAnalysisResult on p.AnalysisId equals f.AnalysisId
+                        where f.ExpireBy < filter.Date
+                        select new { p, f };
+
+            var result = await query
+                .OrderBy(x => x.f.ExpireBy)
+                .Skip(skip)
+                .Take(pageSize)
+                .Select(x => new PassengerHealthAnalysisDto
+                {
+                    PassengerId = x.p.PassengerId,
+                    Name = x.p.Name,
+                    Email = x.p.Email,
+                    AnalysisResult = new FullHealthAnalysisResultDto
+                    {
+                        AllowedToFly = x.f.AllowedToFly,
+                        ExpireBy = x.f.ExpireBy,
+                        GrantedBy = x.f.GrantedBy
                     }
                 })
                 .ToListAsync();

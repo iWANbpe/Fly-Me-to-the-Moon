@@ -162,5 +162,29 @@ namespace Fly_Me_to_the_Moon.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while processing the search request.", details = ex.Message });
             }
         }
+
+        [HttpGet("search/expired-analysis")]
+        public async Task<IActionResult> GetPassengersWithExpiringHealthAnalysis([FromQuery] HealthAnalysisFilterCriteriaDto filter, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 15)
+        {
+            try
+            {
+                var passengers = await _passengerService.GetPassengersWithExpiringHealthAnalysis(
+                    filter,
+                    pageNumber,
+                    pageSize
+                );
+
+                if (passengers == null || passengers.Count == 0)
+                {
+                    return NotFound("No passengers found with expired FHAR before the specified date.");
+                }
+
+                return Ok(passengers);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while processing the search request.", details = ex.Message });
+            }
+        }
     }
 }

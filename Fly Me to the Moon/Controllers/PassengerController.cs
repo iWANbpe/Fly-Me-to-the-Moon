@@ -139,5 +139,28 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [HttpGet("search/expired-insurance")]
+        public async Task<IActionResult> GetPassengersByExpiredInsurance([FromQuery] ExpiredInsuranceFilterCriteriaDto filter, [FromQuery] int pageNumber = 1,[FromQuery] int pageSize = 15)
+        {
+            try
+            {
+                var passengers = await _passengerService.GetPassengersWithExpiredInsurance(
+                    filter,
+                    pageNumber,
+                    pageSize
+                );
+
+                if (passengers == null || passengers.Count == 0)
+                {
+                    return NotFound("No passengers found with expired insurance before the specified date.");
+                }
+
+                return Ok(passengers);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while processing the search request.", details = ex.Message });
+            }
+        }
     }
 }

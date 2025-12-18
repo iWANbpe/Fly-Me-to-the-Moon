@@ -194,5 +194,44 @@ namespace Fly_Me_to_the_Moon.Services
 
             return updatedPassenger;
         }
+
+        public async Task<List<PassengerInsuranceDto>> GetPassengersWithExpiredInsurance(ExpiredInsuranceFilterCriteriaDto filter, int pageNumber = 1, int pageSize = 15)
+        {
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 15;
+
+            int skip = (pageNumber - 1) * pageSize;
+
+            var query = from p in _context.Passenger
+                        join i in _context.Insurance on p.InsuranceId equals i.InsuranceId
+                        where i.ExpireBy < filter.MaxExpiryDate
+                        select new { p, i };
+
+
+            if (!string.IsNullOrWhiteSpace(filter.CompanyName))
+            {
+                string companyNameLower = filter.CompanyName.ToLower();
+                query = query.Where(x => x.i.CompanyGrantedBy.ToLower().Contains(companyNameLower));
+            }
+
+            var result = await query
+                .OrderBy(x => x.i.ExpireBy)
+                .Skip(skip)
+                .Take(pageSize)
+                .Select(x => new PassengerInsuranceDto
+                {
+                    PassengerId = x.p.PassengerId,
+                    Name = x.p.Name,
+                    Email = x.p.Email,
+                    Insurance = new InsuranceDto
+                    {
+                        ExpireBy = x.i.ExpireBy,
+                        CompanyGrantedBy = x.i.CompanyGrantedBy
+                    }
+                })
+                .ToListAsync();
+
+            return result;
+        }
     }
 }

@@ -43,17 +43,21 @@ namespace Fly_Me_to_the_Moon.Data
             modelBuilder.Entity<Passenger>()
                 .Property(p => p.RowVersion)
                 .IsConcurrencyToken()
-                .ValueGeneratedOnAddOrUpdate();
+                .HasColumnType("bigint")
+                .HasDefaultValueSql("1");
 
             modelBuilder.Entity<Insurance>()
                 .Property(i => i.RowVersion)
                 .IsConcurrencyToken()
-                .ValueGeneratedOnAddOrUpdate();
+                .HasColumnType("bigint")
+                .HasDefaultValueSql("1");
 
             modelBuilder.Entity<FullHealthAnalysisResult>()
-                .Property(f => f.RowVersion)
+                .Property(fhar => fhar.RowVersion)
                 .IsConcurrencyToken()
-                .ValueGeneratedOnAddOrUpdate();
+                .HasColumnType("bigint")
+                .HasDefaultValueSql("1");
+
             #endregion
             #region Relationships
             modelBuilder.Entity<ContainerFlight>()

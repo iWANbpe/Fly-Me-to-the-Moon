@@ -3,6 +3,7 @@ using System;
 using Fly_Me_to_the_Moon.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Fly_Me_to_the_Moon.Migrations
 {
     [DbContext(typeof(SpaceFlightContext))]
-    partial class SpaceFlightContextModelSnapshot : ModelSnapshot
+    [Migration("20251218103416_AddRawVersion")]
+    partial class AddRawVersion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,7 +146,7 @@ namespace Fly_Me_to_the_Moon.Migrations
 
                     b.Property<long>("RowVersion")
                         .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bigint")
                         .HasDefaultValueSql("1");
 
@@ -172,7 +175,7 @@ namespace Fly_Me_to_the_Moon.Migrations
 
                     b.Property<long>("RowVersion")
                         .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bigint")
                         .HasDefaultValueSql("1");
 
@@ -209,7 +212,7 @@ namespace Fly_Me_to_the_Moon.Migrations
 
                     b.Property<long>("RowVersion")
                         .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bigint")
                         .HasDefaultValueSql("1");
 

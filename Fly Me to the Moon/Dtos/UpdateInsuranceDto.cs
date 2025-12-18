@@ -4,6 +4,6 @@
     {
         public DateTime ExpireBy { get; set; }
         public string CompanyGrantedBy { get; set; }
-        public uint InsuranceRowVersion { get; set; }
+        public long InsuranceRowVersion { get; set; }
     }
 }

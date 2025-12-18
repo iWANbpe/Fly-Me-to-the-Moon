@@ -28,14 +28,16 @@ namespace Fly_Me_to_the_Moon.Services
                     var insurance = new Insurance
                     {
                         ExpireBy = dto.InsuranceDetails.ExpireBy,
-                        CompanyGrantedBy = dto.InsuranceDetails.CompanyGrantedBy
+                        CompanyGrantedBy = dto.InsuranceDetails.CompanyGrantedBy,
+                        RowVersion = 1
                     };
 
                     var healthAnalysis = new FullHealthAnalysisResult
                     {
                         ExpireBy = dto.FullHealthAnalysisResultDetails.ExpireBy,
                         AllowedToFly = dto.FullHealthAnalysisResultDetails.AllowedToFly,
-                        GrantedBy = dto.FullHealthAnalysisResultDetails.GrantedBy
+                        GrantedBy = dto.FullHealthAnalysisResultDetails.GrantedBy,
+                        RowVersion = 1
                     };
 
                     passengerResult = new Passenger
@@ -43,13 +45,15 @@ namespace Fly_Me_to_the_Moon.Services
                         Name = dto.Name,
                         PhoneNumber = dto.PhoneNumber,
                         Email = dto.Email,
-
+                        RowVersion = 1,
                         Insurance = insurance,
                         InsuranceId = insurance.InsuranceId,
                         FullHealthAnalysisResult = healthAnalysis,
                         AnalysisId = healthAnalysis.AnalysisId
                     };
 
+                    insurance.Passenger = passengerResult;
+                    healthAnalysis.Passenger = passengerResult;
 
                     _context.Passenger.Add(passengerResult);
                     await _context.SaveChangesAsync();
@@ -149,6 +153,7 @@ namespace Fly_Me_to_the_Moon.Services
                     passengerToUpdate.Email = dto.Email;
 
                     _context.Entry(passengerToUpdate).Property(p => p.RowVersion).OriginalValue = dto.PassengerRowVersion;
+                    passengerToUpdate.RowVersion = dto.PassengerRowVersion + 1;
 
                     if (passengerToUpdate.Insurance != null)
                     {
@@ -156,6 +161,7 @@ namespace Fly_Me_to_the_Moon.Services
                         ins.ExpireBy = dto.InsuranceDetails.ExpireBy;
                         ins.CompanyGrantedBy = dto.InsuranceDetails.CompanyGrantedBy;
                         _context.Entry(ins).Property(i => i.RowVersion).OriginalValue = dto.InsuranceDetails.InsuranceRowVersion;
+                        ins.RowVersion = dto.InsuranceDetails.InsuranceRowVersion + 1;
                     }
 
                     if (passengerToUpdate.FullHealthAnalysisResult != null)
@@ -165,6 +171,7 @@ namespace Fly_Me_to_the_Moon.Services
                         fhar.AllowedToFly = dto.FHARDetails.AllowedToFly;
                         fhar.GrantedBy = dto.FHARDetails.GrantedBy;
                         _context.Entry(fhar).Property(f => f.RowVersion).OriginalValue = dto.FHARDetails.FHARRowVersion;
+                        fhar.RowVersion = dto.FHARDetails.FHARRowVersion + 1;
                     }
 
                     await _context.SaveChangesAsync();

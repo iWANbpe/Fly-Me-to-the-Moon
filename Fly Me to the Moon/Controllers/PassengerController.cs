@@ -115,10 +115,6 @@ namespace Fly_Me_to_the_Moon.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdatePassenger(int id, [FromBody] UpdatePassengerDto request)
         {
-            if (id != request.PassengerId)
-            {
-                return BadRequest("Passenger ID mismatch.");
-            }
 
             try
             {
@@ -129,9 +125,9 @@ namespace Fly_Me_to_the_Moon.Controllers
             {
                 return NotFound(ex.Message);
             }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("modified by another user"))
+            catch (InvalidOperationException ex)
             {
-                return Conflict(ex.Message);
+                return Conflict(new { message = ex.Message });
             }
             catch (DbUpdateException ex)
             {

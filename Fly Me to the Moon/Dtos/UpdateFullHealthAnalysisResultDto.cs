@@ -5,6 +5,6 @@
         public DateTime ExpireBy { get; set; }
         public bool AllowedToFly { get; set; }
         public string GrantedBy { get; set; }
-        public uint FHARRowVersion { get; set; }
+        public long FHARRowVersion { get; set; }
     }
 }

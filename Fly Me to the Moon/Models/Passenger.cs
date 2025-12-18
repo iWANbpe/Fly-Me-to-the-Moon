@@ -18,7 +18,7 @@ namespace Fly_Me_to_the_Moon.Models
         public ICollection<PassengerFlight>? PassengerFlight { get; set; } = new List<PassengerFlight>();
         public Baggage? Baggage { get; set; }
 
-        [Timestamp]
-        public uint RowVersion { get; set; }
+        [ConcurrencyCheck]
+        public long RowVersion { get; set; }
     }
 }

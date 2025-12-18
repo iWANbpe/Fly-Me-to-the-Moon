@@ -2,7 +2,7 @@
 
 namespace Fly_Me_to_the_Moon.Dtos
 {
-    public class FlightCreationDto
+    public partial class FlightCreationDto
     {
         [Required]
         public string DeparturePoint { get; set; } = string.Empty;

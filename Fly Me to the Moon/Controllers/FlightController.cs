@@ -4,7 +4,6 @@ using Fly_Me_to_the_Moon.Models;
 using Fly_Me_to_the_Moon.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static Fly_Me_to_the_Moon.Dtos.FlightCreationDto;
 
 namespace Fly_Me_to_the_Moon.Controllers
 {
@@ -219,6 +218,27 @@ namespace Fly_Me_to_the_Moon.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new { message = "Error occurred while assigning spaceship to flight.", details = ex.Message });
+            }
+        }
+
+        [HttpGet("{flightId}/analysis")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FlightAnalysisDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetFlightAnalysis(int flightId)
+        {
+            try
+            {
+                var analysisResult = await _flightService.GetFlightAnalysis(flightId);
+                return Ok(analysisResult);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { message = "Error during flight analysis retrieval.", details = ex.Message });
             }
         }
     }

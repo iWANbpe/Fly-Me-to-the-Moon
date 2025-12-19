@@ -2,7 +2,6 @@
 using Fly_Me_to_the_Moon.Dtos;
 using Fly_Me_to_the_Moon.Models;
 using Microsoft.EntityFrameworkCore;
-using static Fly_Me_to_the_Moon.Dtos.FlightCreationDto;
 
 namespace Fly_Me_to_the_Moon.Services
 {
@@ -251,7 +250,7 @@ namespace Fly_Me_to_the_Moon.Services
         public async Task<Spaceship> GetSpaceshipOnFlight(int flightId)
         {
             var flight = await _context.Flight.FirstOrDefaultAsync(f => f.FlightId == flightId);
-            
+
             if (flight == null)
             {
                 throw new KeyNotFoundException($"Flight with ID {flightId} not found.");
@@ -267,6 +266,41 @@ namespace Fly_Me_to_the_Moon.Services
                 .FirstOrDefaultAsync();
 
             return spaceship;
+        }
+
+        public async Task<FlightAnalysisDto> GetFlightAnalysis(int flightId)
+        {
+            var analysis = await _context.Flight
+                .Where(f => f.FlightId == flightId)
+                .Join(_context.Spaceship,
+                      f => f.SpaceshipName,
+                      s => s.SpaceshipName,
+                      (f, s) => new { Flight = f, Spaceship = s })
+                .Select(joined => new FlightAnalysisDto
+                {
+                    FlightId = joined.Flight.FlightId,
+                    DeparturePoint = joined.Flight.DeparturePoint,
+                    PlaceOfArrival = joined.Flight.PlaceOfArrival,
+                    DepartureDate = joined.Flight.DepartureDate,
+                    ArrivalDate = joined.Flight.ArrivalDate,
+
+                    SpaceshipName = joined.Spaceship.SpaceshipName,
+
+                    CurrentPassengerCount = _context.PassengerFlight.Count(pf => pf.FlightId == joined.Flight.FlightId),
+                    MaxPassengerCapacity = joined.Spaceship.PassengerCapacity,
+                    PassengeroccupancyPercentage = joined.Spaceship.PassengerCapacity == 0 ? 0 :
+                        (double)_context.PassengerFlight.Count(pf => pf.FlightId == joined.Flight.FlightId) / joined.Spaceship.PassengerCapacity * 100,
+
+                    ContainersCapacity = joined.Spaceship.ContainersCapacity
+                })
+                .FirstOrDefaultAsync();
+
+            if (analysis == null)
+            {
+                throw new KeyNotFoundException($"Flight with ID {flightId} not found or has no assigned spaceship.");
+            }
+
+            return analysis;
         }
     }
 

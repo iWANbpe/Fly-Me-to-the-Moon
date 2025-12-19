@@ -112,6 +112,19 @@ namespace Fly_Me_to_the_Moon.Services
                         throw new InvalidOperationException($"Passenger ID {dto.PassengerId} is already assigned to Flight ID {dto.FlightId}.");
                     }
 
+                    var fhar = await _context.Set<FullHealthAnalysisResult>()
+                        .FirstOrDefaultAsync(h => h.AnalysisId == passenger.AnalysisId);
+
+                    if (fhar == null)
+                    {
+                        throw new InvalidOperationException($"Passenger ID {dto.PassengerId} has no completed health analysis. Cannot assign to flight.");
+                    }
+
+                    if (!fhar.AllowedToFly)
+                    {
+                        throw new InvalidOperationException($"Passenger ID {dto.PassengerId} is medically unfit to fly based on analysis");
+                    }
+
                     var passengerFlight = new PassengerFlight
                     {
                         FlightId = dto.FlightId,
@@ -176,12 +189,23 @@ namespace Fly_Me_to_the_Moon.Services
 
                     if (flight == null)
                     {
+
                         await transaction.CommitAsync();
+                        deletionSuccessful = false;
                         return;
                     }
 
-                    _context.Flight.Remove(flight);
+                    var passengerFlightsToDelete = await _context.PassengerFlight
+                        .Where(pf => pf.FlightId == flightId)
+                        .ToListAsync();
 
+                    if (passengerFlightsToDelete.Any())
+                    {
+                        _context.PassengerFlight.RemoveRange(passengerFlightsToDelete);
+                    }
+
+
+                    _context.Flight.Remove(flight);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
@@ -197,7 +221,6 @@ namespace Fly_Me_to_the_Moon.Services
 
             return deletionSuccessful;
         }
-
 
         public async Task<SpaceshipFlightAssignmentDto> AddSpaceshipToFlight(SpaceshipFlightAssignmentDto dto)
         {

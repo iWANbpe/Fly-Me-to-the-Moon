@@ -13,5 +13,8 @@ namespace Fly_Me_to_the_Moon.Models
 
         public ICollection<ServiceLog>? ServiceLog { get; set; }
         public ICollection<Flight>? Flight { get; set; }
+
+        [ConcurrencyCheck]
+        public long RowVersion { get; set; }
     }
 }

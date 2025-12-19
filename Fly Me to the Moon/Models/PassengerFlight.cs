@@ -1,4 +1,6 @@
-﻿namespace Fly_Me_to_the_Moon.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Fly_Me_to_the_Moon.Models
 {
     public class PassengerFlight
     {
@@ -7,5 +9,8 @@
 
         public Passenger? Passenger { get; set; }
         public Flight? Flight { get; set; }
+
+        [ConcurrencyCheck]
+        public long RowVersion { get; set; }
     }
 }

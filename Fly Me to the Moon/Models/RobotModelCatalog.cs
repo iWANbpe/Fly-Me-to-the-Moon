@@ -10,5 +10,8 @@ namespace Fly_Me_to_the_Moon.Models
         public int Weight { get; set; }
 
         public ICollection<Robot> Robot { get; set; } = new List<Robot>();
+
+        [ConcurrencyCheck]
+        public long RowVersion { get; set; }
     }
 }

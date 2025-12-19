@@ -39,7 +39,10 @@ namespace Fly_Me_to_the_Moon.Controllers
                 return NotFound();
             }
 
-            var passenger = await _context.Passenger.FindAsync(id);
+            var passenger = await _context.Passenger
+                .Include(p => p.Insurance)
+                .Include(p => p.FullHealthAnalysisResult)
+                .FirstOrDefaultAsync(p => p.PassengerId == id);
 
             if (passenger == null)
             {

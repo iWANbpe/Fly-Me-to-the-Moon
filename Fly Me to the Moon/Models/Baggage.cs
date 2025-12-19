@@ -13,5 +13,8 @@ namespace Fly_Me_to_the_Moon.Models
 
         public Container? Container { get; set; } = null!;
         public Passenger? Passenger { get; set; }
+
+        [ConcurrencyCheck]
+        public long RowVersion { get; set; }
     }
 }

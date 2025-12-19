@@ -58,6 +58,53 @@ namespace Fly_Me_to_the_Moon.Data
                 .HasColumnType("bigint")
                 .HasDefaultValueSql("1");
 
+            modelBuilder.Entity<Spaceship>()
+                .Property(obj => obj.RowVersion)
+                .IsConcurrencyToken()
+                .HasColumnType("bigint")
+                .HasDefaultValueSql("1");
+
+            modelBuilder.Entity<PassengerFlight>()
+                .Property(obj => obj.RowVersion)
+                .IsConcurrencyToken()
+                .HasColumnType("bigint")
+                .HasDefaultValueSql("1");
+
+            modelBuilder.Entity<ContainerFlight>()
+                .Property(obj => obj.RowVersion)
+                .IsConcurrencyToken()
+                .HasColumnType("bigint")
+                .HasDefaultValueSql("1");
+
+            modelBuilder.Entity<Container>()
+                .Property(obj => obj.RowVersion)
+                .IsConcurrencyToken()
+                .HasColumnType("bigint")
+                .HasDefaultValueSql("1");
+
+            modelBuilder.Entity<Robot>()
+                .Property(obj => obj.RowVersion)
+                .IsConcurrencyToken()
+                .HasColumnType("bigint")
+                .HasDefaultValueSql("1");
+
+            modelBuilder.Entity<RobotModelCatalog>()
+                .Property(obj => obj.RowVersion)
+                .IsConcurrencyToken()
+                .HasColumnType("bigint")
+                .HasDefaultValueSql("1");
+
+            modelBuilder.Entity<ServiceLog>()
+                .Property(obj => obj.RowVersion)
+                .IsConcurrencyToken()
+                .HasColumnType("bigint")
+                .HasDefaultValueSql("1");
+
+            modelBuilder.Entity<Flight>()
+                .Property(obj => obj.RowVersion)
+                .IsConcurrencyToken()
+                .HasColumnType("bigint")
+                .HasDefaultValueSql("1");
             #endregion
             #region Relationships
             modelBuilder.Entity<ContainerFlight>()

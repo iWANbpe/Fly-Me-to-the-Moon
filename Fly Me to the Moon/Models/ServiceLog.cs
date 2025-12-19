@@ -12,5 +12,8 @@ namespace Fly_Me_to_the_Moon.Models
 
         public string SpaceshipName { get; set; } = string.Empty;
         public Spaceship Spaceship { get; set; } = null!;
+
+        [ConcurrencyCheck]
+        public long RowVersion { get; set; }
     }
 }

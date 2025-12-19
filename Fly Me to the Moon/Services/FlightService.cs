@@ -82,7 +82,7 @@ namespace Fly_Me_to_the_Moon.Services
             return flight;
         }
 
-        public async Task<PassengerFlightDetailsDto> AddPassengerToFlightAsync(PassengerFlightAssignmentDto dto)
+        public async Task<PassengerFlightDetailsDto> AddPassengerToFlight(PassengerFlightAssignmentDto dto)
         {
             var strategy = _context.Database.CreateExecutionStrategy();
             PassengerFlightDetailsDto resultDto = null;
@@ -92,7 +92,7 @@ namespace Fly_Me_to_the_Moon.Services
                 await using var transaction = await _context.Database.BeginTransactionAsync();
 
                 try
-                {                 
+                {
                     var flight = await _context.Flight.FirstOrDefaultAsync(f => f.FlightId == dto.FlightId);
                     if (flight == null)
                     {
@@ -198,5 +198,76 @@ namespace Fly_Me_to_the_Moon.Services
 
             return deletionSuccessful;
         }
+
+
+        public async Task<SpaceshipFlightAssignmentDto> AddSpaceshipToFlight(SpaceshipFlightAssignmentDto dto)
+        {
+            var strategy = _context.Database.CreateExecutionStrategy();
+            SpaceshipFlightAssignmentDto resultDto = null;
+
+            await strategy.ExecuteAsync(async () =>
+            {
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+
+                try
+                {
+                    var flight = await _context.Flight.FirstOrDefaultAsync(f => f.FlightId == dto.FlightId);
+                    if (flight == null)
+                    {
+                        throw new KeyNotFoundException($"Flight with ID {dto.FlightId} not found.");
+                    }
+
+                    var spaceship = await _context.Spaceship.FirstOrDefaultAsync(s => s.SpaceshipName == dto.SpaceshipName);
+                    if (spaceship == null)
+                    {
+                        throw new KeyNotFoundException($"Spaceship with name {dto.SpaceshipName} not found.");
+                    }
+
+                    var spaceshipAssignedFlight = await _context.Flight
+                        .AnyAsync(f => f.SpaceshipName == dto.SpaceshipName && f.FlightId == dto.FlightId);
+
+                    if (spaceshipAssignedFlight)
+                    {
+                        throw new InvalidOperationException($"{dto.SpaceshipName} spaceship is already assigned to the fligth with id {dto.FlightId}");
+                    }
+
+                    flight.SpaceshipName = dto.SpaceshipName;
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine($"FATAL TRANSACTION ERROR: {ex.Message}");
+                    throw;
+                }
+            });
+
+            return resultDto;
+        }
+
+        public async Task<Spaceship> GetSpaceshipOnFlight(int flightId)
+        {
+            var flight = await _context.Flight.FirstOrDefaultAsync(f => f.FlightId == flightId);
+            
+            if (flight == null)
+            {
+                throw new KeyNotFoundException($"Flight with ID {flightId} not found.");
+            }
+
+            if (string.IsNullOrEmpty(flight.SpaceshipName))
+            {
+                throw new KeyNotFoundException($"Flight ID {flightId} does not have an assigned spaceship.");
+            }
+
+            var spaceship = await _context.Spaceship
+                .Where(s => s.SpaceshipName == flight.SpaceshipName)
+                .FirstOrDefaultAsync();
+
+            return spaceship;
+        }
     }
+
 }

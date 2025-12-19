@@ -99,7 +99,7 @@ namespace Fly_Me_to_the_Moon.Controllers
 
             try
             {
-                var result = await _flightService.AddPassengerToFlightAsync(assignmentDto);
+                var result = await _flightService.AddPassengerToFlight(assignmentDto);
 
                 return StatusCode(StatusCodes.Status201Created, result);
             }
@@ -164,6 +164,61 @@ namespace Fly_Me_to_the_Moon.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An unexpected error occurred during deletion: {ex.Message}");
+            }
+        }
+
+        [HttpGet("{flightId}/spaceship")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<PassengerNameDto>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetSpaceship(int flightId)
+        {
+            try
+            {
+                var spaceship = await _flightService.GetSpaceshipOnFlight(flightId);
+                return Ok(spaceship);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { message = "Issue accured while trying to get spaceship", details = ex.Message });
+            }
+        }
+
+
+        [HttpPost("assign-spaceship")]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SpaceshipFlightAssignmentDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> AssignSpaceshipToFlight([FromBody] SpaceshipFlightAssignmentDto assignmentDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var result = await _flightService.AddSpaceshipToFlight(assignmentDto);
+
+                return StatusCode(StatusCodes.Status201Created, result);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { message = "Error occurred while assigning spaceship to flight.", details = ex.Message });
             }
         }
     }

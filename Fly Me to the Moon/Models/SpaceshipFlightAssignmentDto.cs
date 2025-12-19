@@ -2,13 +2,13 @@
 
 namespace Fly_Me_to_the_Moon.Dtos
 {
-
-    public class PassengerFlightAssignmentDto
+    public class SpaceshipFlightAssignmentDto
     {
         [Required]
         public int FlightId { get; set; }
 
         [Required]
-        public int PassengerId { get; set; }
+        public string SpaceshipName { get; set; }
     }
+
 }

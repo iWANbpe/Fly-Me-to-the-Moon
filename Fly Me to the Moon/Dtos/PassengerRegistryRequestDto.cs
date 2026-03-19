@@ -16,11 +16,5 @@ namespace Fly_Me_to_the_Moon.Dtos
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Insurance details are required.")]
-        public InsuranceDto InsuranceDetails { get; set; } = null!;
-
-        [Required(ErrorMessage = "Details of Full Health Analysis Result(FHAR) are required.")]
-        public FullHealthAnalysisResultDto FullHealthAnalysisResultDetails { get; set; } = null!;
     }
 }

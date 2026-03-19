@@ -55,6 +55,7 @@ namespace Fly_Me_to_the_Moon.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> RegisterPassenger([FromBody] PassengerRegistryRequestDto request)
         {
             if (!ModelState.IsValid)
@@ -66,17 +67,22 @@ namespace Fly_Me_to_the_Moon.Controllers
             {
                 var newPassenger = await _passengerService.CreatePassengerWithDetails(request);
 
-
+                
                 return CreatedAtAction(
 
-                    actionName: "GetPassenger",
+                    actionName: nameof(GetPassenger),
                     routeValues: new { id = newPassenger.PassengerId },
                     value: newPassenger
                 );
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(ex.Message);
+                if (ex.Message.Contains("exists") || ex.Message.Contains("duplicate"))
+                {
+                    return Conflict(new { message = ex.Message });
+                }
+
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -87,6 +93,7 @@ namespace Fly_Me_to_the_Moon.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeletePassenger(int id)
         {
@@ -101,6 +108,10 @@ namespace Fly_Me_to_the_Moon.Controllers
 
                 return NoContent();
             }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
             catch (ApplicationException ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
@@ -111,6 +122,58 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [HttpPost("{id}/insurance")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> AddInsurance(int id, [FromBody] InsuranceDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (dto.ExpireBy <= DateTime.UtcNow)
+                return BadRequest(new { error = "Insurance policy is already expired." });
+
+            try
+            {
+                var passenger = await _passengerService.AddInsuranceAsync(id, dto);
+                return Ok(passenger);
+            }
+            catch (KeyNotFoundException ex) 
+            { 
+                return NotFound(ex.Message); 
+            }
+            catch (Exception ex) 
+            { 
+                return StatusCode(500, ex.Message); 
+            }
+        }
+
+        [HttpPost("{id}/health-analysis")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> AddHealthAnalysis(int id, [FromBody] FullHealthAnalysisResultDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (dto.ExpireBy <= DateTime.UtcNow)
+                return BadRequest(new { error = "Health analysis is outdated." });
+
+            try
+            {
+                var passenger = await _passengerService.AddHealthAnalysisAsync(id, dto);
+                return Ok(passenger);
+            }
+            catch (KeyNotFoundException ex) 
+            { 
+                return NotFound(ex.Message); 
+            }
+            catch (Exception ex) 
+            { 
+                return StatusCode(500, ex.Message); 
+            }
+        }
+
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -118,6 +181,10 @@ namespace Fly_Me_to_the_Moon.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdatePassenger(int id, [FromBody] UpdatePassengerDto request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
             try
             {
@@ -131,6 +198,10 @@ namespace Fly_Me_to_the_Moon.Controllers
             catch (InvalidOperationException ex)
             {
                 return Conflict(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
             catch (DbUpdateException ex)
             {

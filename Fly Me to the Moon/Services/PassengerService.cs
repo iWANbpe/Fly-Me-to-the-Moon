@@ -25,35 +25,13 @@ namespace Fly_Me_to_the_Moon.Services
 
                 try
                 {
-                    var insurance = new Insurance
-                    {
-                        ExpireBy = dto.InsuranceDetails.ExpireBy,
-                        CompanyGrantedBy = dto.InsuranceDetails.CompanyGrantedBy,
-                        RowVersion = 1
-                    };
-
-                    var healthAnalysis = new FullHealthAnalysisResult
-                    {
-                        ExpireBy = dto.FullHealthAnalysisResultDetails.ExpireBy,
-                        AllowedToFly = dto.FullHealthAnalysisResultDetails.AllowedToFly,
-                        GrantedBy = dto.FullHealthAnalysisResultDetails.GrantedBy,
-                        RowVersion = 1
-                    };
-
                     passengerResult = new Passenger
                     {
                         Name = dto.Name,
                         PhoneNumber = dto.PhoneNumber,
                         Email = dto.Email,
-                        RowVersion = 1,
-                        Insurance = insurance,
-                        InsuranceId = insurance.InsuranceId,
-                        FullHealthAnalysisResult = healthAnalysis,
-                        AnalysisId = healthAnalysis.AnalysisId
+                        RowVersion = 1
                     };
-
-                    insurance.Passenger = passengerResult;
-                    healthAnalysis.Passenger = passengerResult;
 
                     _context.Passenger.Add(passengerResult);
                     await _context.SaveChangesAsync();
@@ -125,6 +103,51 @@ namespace Fly_Me_to_the_Moon.Services
             });
 
             return deletionSuccessful;
+        }
+
+        public async Task<Passenger> AddInsuranceAsync(int passengerId, InsuranceDto dto)
+        {
+            var passenger = await _context.Passenger.FindAsync(passengerId);
+            if (passenger == null) throw new KeyNotFoundException("Passenger not found");
+
+            var insurance = new Insurance
+            {
+                ExpireBy = dto.ExpireBy,
+                CompanyGrantedBy = dto.CompanyGrantedBy,
+                RowVersion = 1
+            };
+
+            _context.Insurance.Add(insurance);
+            await _context.SaveChangesAsync();
+
+            passenger.InsuranceId = insurance.InsuranceId;
+            passenger.RowVersion++;
+
+            await _context.SaveChangesAsync();
+            return passenger;
+        }
+
+        public async Task<Passenger> AddHealthAnalysisAsync(int passengerId, FullHealthAnalysisResultDto dto)
+        {
+            var passenger = await _context.Passenger.FindAsync(passengerId);
+            if (passenger == null) throw new KeyNotFoundException("Passenger not found");
+
+            var analysis = new FullHealthAnalysisResult
+            {
+                ExpireBy = dto.ExpireBy,
+                AllowedToFly = dto.AllowedToFly,
+                GrantedBy = dto.GrantedBy,
+                RowVersion = 1
+            };
+
+            _context.FullHealthAnalysisResult.Add(analysis);
+            await _context.SaveChangesAsync();
+
+            passenger.AnalysisId = analysis.AnalysisId;
+            passenger.RowVersion++;
+
+            await _context.SaveChangesAsync();
+            return passenger;
         }
 
         public async Task<Passenger> UpdatePassengerAndLinked(int passengerId, UpdatePassengerDto dto)

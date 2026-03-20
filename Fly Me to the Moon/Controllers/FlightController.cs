@@ -86,9 +86,10 @@ namespace Fly_Me_to_the_Moon.Controllers
         }
 
         [HttpPost("assign-passenger")]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(PassengerFlightDetailsDto))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> AssignPassengerToFlight([FromBody] PassengerFlightAssignmentDto assignmentDto)
         {
             if (!ModelState.IsValid)
@@ -106,9 +107,13 @@ namespace Fly_Me_to_the_Moon.Controllers
             {
                 return NotFound(new { message = ex.Message });
             }
-            catch (InvalidOperationException ex)
+            catch (ArgumentException ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -239,6 +244,60 @@ namespace Fly_Me_to_the_Moon.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new { message = "Error during flight analysis retrieval.", details = ex.Message });
+            }
+        }
+
+        [HttpPost("register-baggage")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> RegisterBaggage([FromBody] BaggageRegistrationDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var result = await _flightService.RegisterBaggageToFlight(dto);
+                return StatusCode(StatusCodes.Status201Created, result);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateFlight(int id, [FromBody] FlightUpdateDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var updatedFlight = await _flightService.UpdateFlight(id, dto);
+                return Ok(updatedFlight);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { message = "An error occurred during the update.", details = ex.Message });
             }
         }
     }

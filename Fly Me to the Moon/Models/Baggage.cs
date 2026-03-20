@@ -6,7 +6,7 @@ namespace Fly_Me_to_the_Moon.Models
     {
         [Key]
         public int BaggageId { get; set; }
-        public int MaxWeight { get; set; }
+        public double MaxWeight { get; set; }
         public int? PassengerId { get; set; }
         public int? ContainerId { get; set; }
         public string Type { get; set; } = string.Empty;

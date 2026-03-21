@@ -1,5 +1,6 @@
 ﻿using Fly_Me_to_the_Moon.Dtos;
 using Fly_Me_to_the_Moon.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fly_Me_to_the_Moon.Controllers
@@ -15,6 +16,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             _spaceshipService = spaceshipService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SpaceshipDetailsDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -46,6 +48,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<SpaceshipDetailsDto>))]
         public async Task<IActionResult> GetAllSpaceships()
@@ -54,6 +57,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             return Ok(spaceships);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{name}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SpaceshipDetailsDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -75,6 +79,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{name}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

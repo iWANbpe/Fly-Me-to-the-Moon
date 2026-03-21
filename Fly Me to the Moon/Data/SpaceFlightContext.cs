@@ -19,7 +19,7 @@ namespace Fly_Me_to_the_Moon.Data
         public DbSet<RobotModelCatalog> RobotModelCatalog { get; set; } = null!;
         public DbSet<Spaceship> Spaceship { get; set; } = null!;
         public DbSet<ServiceLog> ServiceLog { get; set; } = null!;
-
+        public DbSet<Admin> Admin { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -105,6 +105,10 @@ namespace Fly_Me_to_the_Moon.Data
                 .IsConcurrencyToken()
                 .HasColumnType("bigint")
                 .HasDefaultValueSql("1");
+            
+            modelBuilder.Entity<Admin>()
+                .Property(a => a.AdminId)
+                .ValueGeneratedOnAdd();
             #endregion
             #region Relationships
             modelBuilder.Entity<ContainerFlight>()
@@ -156,6 +160,7 @@ namespace Fly_Me_to_the_Moon.Data
             modelBuilder.Entity<RobotModelCatalog>().ToTable("robot_model_catalog");
             modelBuilder.Entity<Spaceship>().ToTable("spaceship");
             modelBuilder.Entity<ServiceLog>().ToTable("service_log");
+            modelBuilder.Entity<Admin>().ToTable("admin");
             #endregion
             #region Indexes
             modelBuilder.Entity<Passenger>()

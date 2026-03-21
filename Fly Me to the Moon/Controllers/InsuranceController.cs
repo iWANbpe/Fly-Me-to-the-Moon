@@ -1,5 +1,6 @@
 ﻿using Fly_Me_to_the_Moon.Data;
 using Fly_Me_to_the_Moon.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,7 @@ public class InsuranceController : ControllerBase
         return await _context.Insurance.ToListAsync();
     }
 
+    [Authorize]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -48,6 +50,7 @@ public class InsuranceController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

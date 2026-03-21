@@ -2,6 +2,7 @@
 using Fly_Me_to_the_Moon.Dtos;
 using Fly_Me_to_the_Moon.Models;
 using Fly_Me_to_the_Moon.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             _passengerService = bookingService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Passenger>>> GetPassengers()
         {
@@ -31,6 +33,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             return await _context.Passenger.ToListAsync();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Passenger>> GetPassenger(int id)
         {
@@ -52,6 +55,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             return passenger;
         }
 
+        [Authorize(Roles = "Passenger")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -90,6 +94,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [Authorize(Roles = "Passenger")]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -122,6 +127,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [Authorize(Roles = "Passenger")]
         [HttpPost("{id}/insurance")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -148,6 +154,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [Authorize(Roles = "Passenger")]
         [HttpPost("{id}/health-analysis")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -174,6 +181,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [Authorize(Roles = "Passenger")]
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -213,6 +221,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("search/expired-insurance")]
         public async Task<IActionResult> GetPassengersByExpiredInsurance([FromQuery] ExpiredInsuranceFilterCriteriaDto filter, [FromQuery] int pageNumber = 1,[FromQuery] int pageSize = 15)
         {
@@ -237,6 +246,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("search/expired-analysis")]
         public async Task<IActionResult> GetPassengersWithExpiringHealthAnalysis([FromQuery] HealthAnalysisFilterCriteriaDto filter, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 15)
         {

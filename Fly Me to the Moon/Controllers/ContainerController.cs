@@ -1,6 +1,7 @@
 ﻿using Fly_Me_to_the_Moon.Dtos;
 using Fly_Me_to_the_Moon.Models;
 using Fly_Me_to_the_Moon.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fly_Me_to_the_Moon.Controllers
@@ -16,6 +17,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             _containerService = containerService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Container))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -52,6 +54,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Container))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

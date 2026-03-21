@@ -19,10 +19,23 @@ namespace Fly_Me_to_the_Moon.Services
             _config = config;
         }
 
-        public async Task<string> LoginPassengerAsync(LoginDto dto)
+        public async Task<string> LoginAdmin(LoginDto dto)
+        {
+            var admin = await _context.Admin
+                .FirstOrDefaultAsync(a => a.AdminName == dto.Username);
+
+            if (admin == null || !BCrypt.Net.BCrypt.Verify(dto.Password, admin.PasswordHash))
+            {
+                throw new UnauthorizedAccessException("Invalid admin credentials.");
+            }
+
+            return CreateToken(admin.AdminId.ToString(), admin.AdminName, "Admin");
+        }
+
+        public async Task<string> LoginPassenger(LoginDto dto)
         {
             var passenger = await _context.Passenger
-                .FirstOrDefaultAsync(p => p.Email == dto.Email);
+                .FirstOrDefaultAsync(p => p.Email == dto.Username);
 
             if (passenger == null || !BCrypt.Net.BCrypt.Verify(dto.Password, passenger.PasswordHash))
             {

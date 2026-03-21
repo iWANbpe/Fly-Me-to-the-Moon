@@ -2,6 +2,7 @@
 using Fly_Me_to_the_Moon.Dtos;
 using Fly_Me_to_the_Moon.Models;
 using Fly_Me_to_the_Moon.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             _context = context;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(FlightDetailsDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -67,6 +69,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             return await _context.Flight.ToListAsync();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Flight>> GetFlight(int id)
         {
@@ -85,6 +88,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             return flight;
         }
 
+        [Authorize]
         [HttpPost("assign-passenger")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -122,6 +126,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{flightId}/passengers")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<PassengerNameDto>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -144,6 +149,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -171,6 +177,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{flightId}/spaceship")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<PassengerNameDto>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -193,7 +200,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPost("assign-spaceship")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SpaceshipFlightAssignmentDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -226,6 +233,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{flightId}/analysis")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FlightAnalysisDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -247,6 +255,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [Authorize(Roles = "Passenger")]
         [HttpPost("register-baggage")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -270,6 +279,7 @@ namespace Fly_Me_to_the_Moon.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

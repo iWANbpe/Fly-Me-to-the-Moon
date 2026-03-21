@@ -1,4 +1,5 @@
 ﻿using Fly_Me_to_the_Moon.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
@@ -18,6 +19,7 @@ namespace FlyMeToTheMoon.Controllers
             _context = context;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("db-table-count")]
         public async Task<IActionResult> GetDbTableCount()
         {

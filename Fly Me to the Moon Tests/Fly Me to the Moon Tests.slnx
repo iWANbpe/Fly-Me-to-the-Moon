@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../Fly Me to the Moon/Fly Me to the Moon.csproj" />
+  <Project Path="Fly Me to the Moon Tests/Fly Me to the Moon Tests.csproj" />
+</Solution>

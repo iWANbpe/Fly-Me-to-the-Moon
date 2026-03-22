@@ -1,9 +1,10 @@
 ﻿using Fly_Me_to_the_Moon.Data;
 using Fly_Me_to_the_Moon.Dtos;
 using Fly_Me_to_the_Moon.Models;
+using Fly_Me_to_the_Moon.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace Fly_Me_to_the_Moon.Services
+namespace Fly_Me_to_the_Moon.Tests.Services
 {
     public class ContainerServiceTests
     {

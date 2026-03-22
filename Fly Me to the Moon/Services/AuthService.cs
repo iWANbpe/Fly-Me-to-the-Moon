@@ -1,5 +1,6 @@
 ﻿using Fly_Me_to_the_Moon.Data;
 using Fly_Me_to_the_Moon.Dtos;
+using Fly_Me_to_the_Moon.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -43,6 +44,41 @@ namespace Fly_Me_to_the_Moon.Services
             }
 
             return CreateToken(passenger.PassengerId.ToString(), passenger.Email, "Passenger");
+        }
+
+        public async Task RegisterAdmin(RegisterDto dto)
+        {
+            if (await _context.Admin.AnyAsync(a => a.AdminName == dto.Username))
+                throw new InvalidOperationException("Admin already exists.");
+
+            var admin = new Admin
+            {
+                AdminName = dto.Username,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password)
+            };
+
+            _context.Admin.Add(admin);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RegisterPassenger(RegisterDto dto)
+        {
+            if (await _context.Passenger.AnyAsync(p => p.Name == dto.Username))
+                throw new InvalidOperationException("Passenger already exists.");
+
+            var passenger = new Passenger
+            {
+                Name = dto.Username,
+                Email = dto.Email ?? "not set",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+                PhoneNumber = "not set",
+
+                AnalysisId = null,
+                InsuranceId = null
+            };
+
+            _context.Passenger.Add(passenger);
+            await _context.SaveChangesAsync();
         }
 
         private string CreateToken(string id, string name, string role)

@@ -1,6 +1,5 @@
 ﻿using Fly_Me_to_the_Moon.Dtos;
 using Fly_Me_to_the_Moon.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fly_Me_to_the_Moon.Controllers
@@ -43,5 +42,34 @@ namespace Fly_Me_to_the_Moon.Controllers
                 return Unauthorized(new { message = ex.Message });
             }
         }
+
+        [HttpPost("register/admin")]
+        public async Task<IActionResult> RegisterAdmin([FromBody] RegisterDto dto)
+        {
+            try
+            {
+                await _authService.RegisterAdmin(dto);
+                return Ok(new { message = "Admin registered successfully" });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("register/passenger")]
+        public async Task<IActionResult> RegisterPassenger([FromBody] RegisterDto dto)
+        {
+            try
+            {
+                await _authService.RegisterPassenger(dto);
+                return Ok(new { message = "Passenger registered successfully" });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
+        }
+
     }
 }
